@@ -9,11 +9,10 @@ class Node
 
 	def add_child child
 		case depth - child.depth + 1
-		when 0
-			@last_child = Node.new(child,self)
-			@children << @last_child
-		when 1
-			last_child.add_child(child)
+		when 0 # this is my child
+			@children << Node.new(child,self)
+		else # this is my grandchild.
+			@children.last.add_child(child)
 		end
 	end
 
