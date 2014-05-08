@@ -4,26 +4,29 @@ class DataForestGenerator
                'CONC','TITL','PUBL',
                'REPO','AUTH']
   IGNORE_REGEX = /@([NRS]\d+)@/
+  INDI_REGEX = /@(I\d+)@/
 
   def initialize lines
-
     @forest = DataForest.new(trim segment lines)
   end
 
-  def segment lines
-    groups = []
-    lines.each do |line|
-      groups << [] if line.depth == 0
-      groups.last << line
+  private
+    # Takes an array of Lines and splits it into
+    # an array of arrays of Lines, each sub-array
+    # starting with a Line with depth = 0.
+    def segment lines
+      groups = []
+      lines.each do |line|
+        groups << [] if line.depth == 0
+        groups.last << line
+      end
+      groups
     end
-    groups
-  end
 
-  def trim groups
-    groups.map do |group|
-      code = group.first.code
-      return nil if code =~ IGNORE_REGEX || SKIP_LIST.include?(code)
-      return group
-    end.delete_if(&:nil?)
-  end
+    # Selects only the groups that represent a person
+    def trim groups
+      groups.select do |group|
+        group.first.code.match(INDI_REGEX)
+      end
+    end
 end
