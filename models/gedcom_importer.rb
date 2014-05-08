@@ -1,3 +1,5 @@
+include 'gedcom_parser'
+
 class GedcomImporter
 
 	ID_REGEX = /@(.{2})@/
@@ -6,7 +8,6 @@ class GedcomImporter
 	TWO_PART_LINE_REGEX = /^(\d+)\s(\b\S+\b)$/
 	THREE_PART_LINE_REGEX = /^(\d+)\s(\b\S+\b)\s(\S.*)$/
 	ID_LINE_REGEX = /^(\d+)\s(@\S+@)\s(.*)$/
-	LINE_REGEX = /^(\d+)\s(@.+@|\b\S+\b)(.*)$/
 	NAME_REGEX = /(\w+\b)\s(\w*\b)?\s?\/(\b\w+\b)\//
 
 	SKIP_LIST = ['HEAD','TRLR','VERS','CORP','SOUR','CONT','CONC','TITL','PUBL','REPO','AUTH']
@@ -37,13 +38,8 @@ class GedcomImporter
 	end
 
 	def perform
-		tokenize
+		lines = GedcomParser.new(@file).parse
 		organize
-	end
-
-	def tokenize
-		@lines = @file.map { |line|	Line.new(line.match(LINE_REGEX),@lines.last) }
-		@lines
 	end
 
 	def prune
